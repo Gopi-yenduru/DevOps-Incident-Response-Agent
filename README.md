@@ -11,7 +11,7 @@ A production-grade Autonomous DevOps Incident Response Agent. Monitors applicati
 
 ## ✨ Features
 
-- **5-Agent AI Pipeline:** Powered by LangGraph and Google Gemini 2.0.
+- **5-Agent AI Pipeline:** Powered by LangGraph and Google Gemini.
   - *Anomaly Detector:* Identifies true errors vs noise.
   - *Incident Correlator:* Groups related incidents.
   - *Root Cause Analyzer:* Performs deep causal reasoning.

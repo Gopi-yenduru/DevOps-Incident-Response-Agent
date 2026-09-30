@@ -10,7 +10,7 @@ tests never make network calls or touch a live DB.
 import os
 
 os.environ.setdefault("GEMINI_API_KEY", "test-key-not-real")
-os.environ.setdefault("GEMINI_MODEL", "gemini-2.0-flash")
+os.environ.setdefault("GEMINI_MODEL", "gemini-3.8-flash")
 os.environ.setdefault(
     "DATABASE_URL",
     "postgresql+asyncpg://user:pass@localhost:5432/devops_agent_test",
