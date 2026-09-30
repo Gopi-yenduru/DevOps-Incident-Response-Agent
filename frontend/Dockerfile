@@ -2,9 +2,9 @@ FROM node:18-alpine as builder
 
 WORKDIR /app
 
-# Install dependencies
-COPY package.json package-lock.json* ./
-RUN npm install
+# Install dependencies from the committed lockfile for reproducible builds
+COPY package.json package-lock.json ./
+RUN npm ci
 
 # Build
 COPY . .

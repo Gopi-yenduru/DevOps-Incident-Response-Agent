@@ -33,9 +33,12 @@ services:
       - GITHUB_REPO=${GITHUB_REPO}
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL:-}
       - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-user}:${POSTGRES_PASSWORD:-pass}@db:5432/${POSTGRES_DB:-devops_agent}
       - DEBUG=${DEBUG:-false}
-      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000,http://localhost:5173}
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000,http://localhost:5173,http://localhost:3001}
+      - PUBLIC_API_URL=${PUBLIC_API_URL:-http://localhost:8080}
+      - API_KEY=${API_KEY:-}
     depends_on:
       db:
         condition: service_healthy
@@ -53,6 +56,7 @@ services:
       - ANOMALY_RATE=${ANOMALY_RATE:-0.2}
       - INTERVAL_SECONDS=${INTERVAL_SECONDS:-10}
       - SIMULATOR_APP_ID=${SIMULATOR_APP_ID:-}
+      - API_KEY=${API_KEY:-}
     depends_on:
       backend:
         condition: service_healthy
@@ -67,8 +71,9 @@ services:
     container_name: devops_agent_frontend
     ports:
       - "3001:80"
-    environment:
-      - VITE_API_BASE_URL=http://localhost:8080
+    # The frontend is a static nginx build; it reads the API base URL at
+    # runtime from public/config.js (window.APP_CONFIG), not from a build-time
+    # env var. To point it elsewhere, edit frontend/public/config.js.
     depends_on:
       backend:
         condition: service_started

@@ -45,6 +45,12 @@ yarn-debug.log
 *.swo
 .DS_Store
 
+# Test / tooling caches
+.pytest_cache/
+.coverage
+htmlcov/
+.ruff_cache/
+
 # Logs
 logs/
 *.log

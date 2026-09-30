@@ -24,7 +24,9 @@ export default function Analytics() {
     }).catch(console.error)
       .finally(() => setLoading(false));
 
-    api._fetch('/analytics/errors').then(res => setErrorRanking(res.error_types || []));
+    api.getErrorRanking()
+      .then(res => setErrorRanking(res.error_types || []))
+      .catch(console.error);
   }, []);
 
   if (loading) return <div className="p-8 text-center text-slate-400">Loading analytics...</div>;

@@ -44,6 +44,12 @@ class Settings(BaseSettings):
         description="Telegram chat/channel ID to receive alerts",
     )
 
+    # ── Slack Notifications ────────────────────────────────────────────
+    SLACK_WEBHOOK_URL: str = Field(
+        default="",
+        description="Slack Incoming Webhook URL for sending incident alerts",
+    )
+
     # ── Database ───────────────────────────────────────────────────────
     DATABASE_URL: str = Field(
         default="postgresql+asyncpg://user:pass@db:5432/devops_agent",
@@ -80,9 +86,25 @@ class Settings(BaseSettings):
         default=False,
         description="Enable debug mode with verbose logging",
     )
+    API_KEY: str = Field(
+        default="",
+        description=(
+            "Optional API key for the machine-to-machine log ingestion "
+            "endpoint. When empty (default) the endpoint is open; when set, "
+            "callers must send a matching X-API-Key header."
+        ),
+    )
     CORS_ORIGINS: str = Field(
-        default="http://localhost:3000,http://localhost:5173",
+        default="http://localhost:3000,http://localhost:5173,http://localhost:3001",
         description="Comma-separated list of allowed CORS origins",
+    )
+    PUBLIC_API_URL: str = Field(
+        default="http://localhost:8080",
+        description=(
+            "Externally reachable base URL of this API, used when building "
+            "webhook/integration URLs shown to users. Matches the port the "
+            "backend is published on in docker-compose."
+        ),
     )
 
     @property

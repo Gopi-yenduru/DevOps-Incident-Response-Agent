@@ -19,6 +19,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
 from models.incident import LogEntry
 from models.app_target import MonitoredApp
+from security import require_api_key
 
 logger = logging.getLogger("devops_agent.logs")
 router = APIRouter()
@@ -86,18 +87,58 @@ async def process_logs_background(
     app_id: str,
 ):
     """
-    Background task: send queued logs through the agent pipeline.
-    This is a placeholder that will be wired to the LangGraph pipeline in Phase 2.
+    Background task: send queued anomalous logs through the 5-agent pipeline.
+
+    Fetches the raw log text for the given entries, then runs the pipeline,
+    which persists an Incident and marks the source logs as processed. Any
+    logs missed here (e.g. process crash) are still picked up by the
+    background log monitor, so processing is at-least-once.
     """
+    if not log_entry_ids:
+        return
+
     logger.info(
         f"[background] Processing {len(log_entry_ids)} anomalous logs "
         f"for app {app_id}"
     )
-    # Phase 2 will import and call: await run_incident_pipeline(log_entry_ids, app_id)
+
+    try:
+        from agents.graph import run_incident_pipeline
+        from database import get_db_context
+
+        # Fetch the raw log text for the queued entries
+        combined_lines: list[str] = []
+        async with get_db_context() as db:
+            for lid in log_entry_ids:
+                try:
+                    entry = await db.get(LogEntry, uuid.UUID(lid))
+                except ValueError:
+                    continue
+                if entry:
+                    combined_lines.append(entry.raw_log)
+
+        if not combined_lines:
+            logger.warning("[background] No log text found for queued entries")
+            return
+
+        await run_incident_pipeline(
+            log_text="\n".join(combined_lines),
+            app_id=app_id,
+            log_entry_ids=log_entry_ids,
+        )
+    except Exception as e:
+        logger.error(
+            f"[background] Pipeline failed for app {app_id}: {e}",
+            exc_info=True,
+        )
 
 
 # ── Endpoints ──────────────────────────────────────────────────────────
-@router.post("/logs/ingest", response_model=None)
+@router.post(
+    "/logs/ingest",
+    response_model=None,
+    dependencies=[Depends(require_api_key)],
+)
 async def ingest_logs(
     request: LogIngestRequest,
     background_tasks: BackgroundTasks,

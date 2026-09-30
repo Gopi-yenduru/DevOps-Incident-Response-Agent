@@ -28,6 +28,7 @@ DEFAULT_OUTPUT: dict[str, Any] = {
     "github_issue_url": None,
     "github_pr_url": None,
     "telegram_sent": False,
+    "slack_sent": False,
     "actions_taken": [],
 }
 
@@ -57,6 +58,7 @@ async def orchestrate_response(
         "github_issue_url": None,
         "github_pr_url": None,
         "telegram_sent": False,
+        "slack_sent": False,
         "actions_taken": [],
     }
 
@@ -134,6 +136,30 @@ async def orchestrate_response(
             "[agent:response_orchestrator] Telegram integration not configured, skipping"
         )
         result["actions_taken"].append("telegram_not_configured")
+
+    # ── 4. Send Slack Alert ────────────────────────────────────────
+    if settings.SLACK_WEBHOOK_URL:
+        try:
+            from services.slack_service import send_incident_alert as send_slack_alert
+
+            slack_sent = await send_slack_alert(incident_data)
+            result["slack_sent"] = slack_sent
+            if slack_sent:
+                result["actions_taken"].append("sent_slack")
+                logger.info("[agent:response_orchestrator] Slack alert sent")
+            else:
+                result["actions_taken"].append("slack_send_failed")
+        except Exception as e:
+            logger.error(
+                f"[agent:response_orchestrator] Slack alert failed: {e}",
+                exc_info=True,
+            )
+            result["actions_taken"].append("slack_failed")
+    else:
+        logger.info(
+            "[agent:response_orchestrator] Slack integration not configured, skipping"
+        )
+        result["actions_taken"].append("slack_not_configured")
 
     logger.info(
         f"[agent:response_orchestrator] completed | "

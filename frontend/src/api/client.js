@@ -4,7 +4,7 @@
  */
 
 const getBaseUrl = () => {
-  return window?.APP_CONFIG?.API_BASE_URL || 'http://localhost:8000';
+  return window?.APP_CONFIG?.API_BASE_URL || 'http://localhost:8080';
 };
 
 class ApiClient {
@@ -93,6 +93,10 @@ class ApiClient {
 
   async getSeverityBreakdown() {
     return this._fetch('/analytics/severity');
+  }
+
+  async getErrorRanking() {
+    return this._fetch('/analytics/errors');
   }
 }
 

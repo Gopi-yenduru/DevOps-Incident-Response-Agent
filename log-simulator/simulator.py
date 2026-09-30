@@ -31,6 +31,8 @@ logger = logging.getLogger("log_simulator")
 # ── Configuration ──────────────────────────────────────────────────────
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
 SIMULATOR_APP_ID = os.getenv("SIMULATOR_APP_ID", "")
+# Sent as X-API-Key on ingestion if the backend has API_KEY protection enabled.
+API_KEY = os.getenv("API_KEY", "")
 ANOMALY_RATE = float(os.getenv("ANOMALY_RATE", "0.2"))
 INTERVAL_SECONDS = int(os.getenv("INTERVAL_SECONDS", "10"))
 BATCH_SIZE = int(os.getenv("BATCH_SIZE", "5"))
@@ -226,6 +228,7 @@ async def run_simulator() -> None:
                         "logs": logs,
                         "timestamp": datetime.now(timezone.utc).isoformat(),
                     },
+                    headers={"X-API-Key": API_KEY} if API_KEY else None,
                 )
 
                 batch_count += 1

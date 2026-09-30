@@ -102,7 +102,7 @@ async def get_app(
     """
     app = await _get_app_or_404(app_id, db)
 
-    base_url = "http://localhost:8000"  # Will be dynamic in production
+    base_url = settings.PUBLIC_API_URL.rstrip("/")
 
     return {
         "success": True,
