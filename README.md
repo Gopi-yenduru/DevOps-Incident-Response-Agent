@@ -7,7 +7,7 @@
 
 A production-grade Autonomous DevOps Incident Response Agent. Monitors applications in real-time, leverages a 5-agent LangGraph AI pipeline to diagnose root causes, and automatically orchestrates responses (GitHub Issues, PRs, and Telegram alerts).
 
-![Agent Demo](https://via.placeholder.com/800x400.png?text=Demo+GIF+Placeholder)
+![DevOps Incident Agent Dashboard](docs/screenshots/dashboard.jpg)
 
 ## ✨ Features
 
@@ -22,6 +22,18 @@ A production-grade Autonomous DevOps Incident Response Agent. Monitors applicati
 - **Real-Time Dashboard:** React frontend displaying live incidents, MTTR trends, and agent accuracy.
 - **Webhook Integration:** Easily push logs from any app using HMAC-SHA256 secured webhooks.
 - **Built-in Log Simulator:** Test and demo the system with realistic mock logs.
+
+## 📸 Screenshots
+
+### Live Dashboard
+Real-time feed of open incidents with severity, affected service, error type, and per-incident AI confidence.
+
+![Dashboard](docs/screenshots/dashboard.jpg)
+
+### Analytics & Trends
+MTTR trend, incidents by severity, and the most frequent error types across all incidents.
+
+![Analytics](docs/screenshots/analytics.jpg)
 
 ## 📊 Real-World Impact
 
